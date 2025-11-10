@@ -3,33 +3,56 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Abrir sala en Adostu…</title>
-<style>body{font-family:system-ui, sans-serif; margin:2rem}</style>
+<style>
+  :root { color-scheme: light dark }
+  body { font-family: system-ui, sans-serif; margin: 2rem; }
+  a.button { display:inline-block; padding:.75rem 1rem; border-radius:.5rem; border:1px solid currentColor; text-decoration:none }
+  .muted{opacity:.7}
+</style>
 <body>
 <h1>Abriendo sala…</h1>
-<p>Si no se abre automáticamente, pulsa el botón:</p>
+<p class="muted">Si no se abre automáticamente, usa el botón de abajo.</p>
 <p id="fallback"></p>
 
 <script>
-(function(){
-  // Esperamos rutas tipo: /adostu/j/AB12CD  (para project pages)
-  var path = location.pathname;              // p.ej. /adostu/j/AB12CD
-  // Busca el segmento 'j' y toma el siguiente como código
-  var parts = path.split("/").filter(Boolean); // ["adostu","j","AB12CD"]
+(function () {
+  // Para GitHub Pages de proyecto: /adostu/j/CODIGO
+  // y también soporta /j/CODIGO
+  var parts = location.pathname.split("/").filter(Boolean);
   var jIndex = parts.indexOf("j");
   var code = (jIndex >= 0 && parts[jIndex+1]) ? parts[jIndex+1].toUpperCase() : "";
 
-  // Construye el deep link a la app
+  // 1) Deep link a la app
   var deeplink = "adostu://app/join/" + code;
 
-  // Intenta abrir la app
-  // location.replace evita que el usuario vuelva a este HTML al pulsar atrás
-  location.replace(deeplink);
+  // 2) Fallback: Play Store (prueba cerrada / mismo id)
+  var playUrl = "https://play.google.com/store/apps/details?id=com.abr000.adostu";
 
-  // Fallback visual por si el sistema no abre el esquema personalizado
+  // Intento de abrir la app
+  // - En Android/Chrome, si el esquema no existe, tras ~500–800ms seguimos en esta página.
+  var opened = false;
+  function tryOpen() {
+    // Usamos location.href para provocar la resolución del esquema
+    location.href = deeplink;
+    // Programamos fallback a Play Store si seguimos aquí
+    setTimeout(function(){
+      if (!opened) location.replace(playUrl);
+    }, 800);
+  }
+
+  // Si el usuario vuelve desde la app (back), marcamos como "opened" para no mandar a Play.
+  window.addEventListener("pageshow", function(){ opened = true; });
+
+  // Lanza apertura de app
+  tryOpen();
+
+  // Botón manual por si el navegador bloquea la navegación automática
   var a = document.createElement("a");
+  a.className = "button";
   a.href = deeplink;
-  a.textContent = "Abrir sala " + (code || "") + " en Adostu";
+  a.textContent = "Abrir sala " + (code || "");
   document.getElementById("fallback").appendChild(a);
 })();
 </script>
 </body>
+</html>
