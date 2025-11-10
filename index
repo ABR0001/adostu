@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Adostu</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 2rem; }
+</style>
+<h1>Adostu</h1>
+<p>Para unirte a una sala usa un enlace como:</p>
+<pre>https://TU-USUARIO.github.io/adostu/j/AB12CD</pre>
