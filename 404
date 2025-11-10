@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Abrir sala en Adostu…</title>
+<style>body{font-family:system-ui, sans-serif; margin:2rem}</style>
+<body>
+<h1>Abriendo sala…</h1>
+<p>Si no se abre automáticamente, pulsa el botón:</p>
+<p id="fallback"></p>
+
+<script>
+(function(){
+  // Esperamos rutas tipo: /adostu/j/AB12CD  (para project pages)
+  var path = location.pathname;              // p.ej. /adostu/j/AB12CD
+  // Busca el segmento 'j' y toma el siguiente como código
+  var parts = path.split("/").filter(Boolean); // ["adostu","j","AB12CD"]
+  var jIndex = parts.indexOf("j");
+  var code = (jIndex >= 0 && parts[jIndex+1]) ? parts[jIndex+1].toUpperCase() : "";
+
+  // Construye el deep link a la app
+  var deeplink = "adostu://app/join/" + code;
+
+  // Intenta abrir la app
+  // location.replace evita que el usuario vuelva a este HTML al pulsar atrás
+  location.replace(deeplink);
+
+  // Fallback visual por si el sistema no abre el esquema personalizado
+  var a = document.createElement("a");
+  a.href = deeplink;
+  a.textContent = "Abrir sala " + (code || "") + " en Adostu";
+  document.getElementById("fallback").appendChild(a);
+})();
+</script>
+</body>
