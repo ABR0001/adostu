@@ -25,28 +25,62 @@
   // 1) Deep link a la app
   var deeplink = "adostu://app/join/" + code;
 
-  // 2) Fallback: Play Store (prueba cerrada / mismo id)
+  // 2) Fallback: Play Store
   var playUrl = "https://play.google.com/store/apps/details?id=com.abr000.adostu";
 
+  // 🔎 Detectar iOS
+  var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (isIOS) {
+    // Idioma principal del dispositivo (ej: "es-ES", "eu-ES", "en-US", ...)
+    var lang = (navigator.language || navigator.userLanguage || "en").toLowerCase();
+    var short = lang.split("-")[0]; // "es", "eu", "en", ...
+
+    var titleText;
+    var subtitleText;
+
+    if (short === "es") {
+      titleText = "Usas iPhone…";
+      subtitleText = "Esto es para gente que toma buenas decisiones 😉";
+    } else if (short === "eu") {
+      titleText = "iPhone erabiltzen duzu…";
+      subtitleText = "Hau erabaki onak hartzen dituztenentzat da 😉";
+    } else {
+      titleText = "You use an iPhone…";
+      subtitleText = "This is for people who make good decisions 😉";
+    }
+
+    var h1 = document.querySelector("h1");
+    if (h1) h1.textContent = titleText;
+
+    var muted = document.querySelector(".muted");
+    if (muted) muted.textContent = subtitleText;
+
+    // Limpiamos el área del botón
+    var fb = document.getElementById("fallback");
+    if (fb) fb.textContent = "";
+
+    // Muy importante: NO intentamos abrir la app ni ir a Play Store
+    return;
+  }
+
+  // --- Comportamiento normal (Android, etc.) ---
+
   // Intento de abrir la app
-  // - En Android/Chrome, si el esquema no existe, tras ~500–800ms seguimos en esta página.
   var opened = false;
   function tryOpen() {
-    // Usamos location.href para provocar la resolución del esquema
     location.href = deeplink;
-    // Programamos fallback a Play Store si seguimos aquí
     setTimeout(function(){
       if (!opened) location.replace(playUrl);
     }, 800);
   }
 
-  // Si el usuario vuelve desde la app (back), marcamos como "opened" para no mandar a Play.
   window.addEventListener("pageshow", function(){ opened = true; });
 
   // Lanza apertura de app
   tryOpen();
 
-  // Botón manual por si el navegador bloquea la navegación automática
+  // Botón manual
   var a = document.createElement("a");
   a.className = "button";
   a.href = deeplink;
